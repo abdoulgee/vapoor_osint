@@ -1,13 +1,36 @@
 /**
  * MapView — SOC dark intelligence map with neon green markers,
  * glow effects, and pulsing animation for high-risk markers.
+ *
+ * Includes FixMap component to force invalidateSize() on mount
+ * (required when Leaflet is inside flex layouts).
  */
 
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { useEffect } from 'react';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 
-// Create neon marker icons based on risk level
+// ── FixMap — forces Leaflet to recalculate size in flex containers ──
+function FixMap() {
+    const map = useMap();
+
+    useEffect(() => {
+        // Initial resize after mount
+        setTimeout(() => {
+            map.invalidateSize();
+        }, 100);
+
+        // Also resize on window resize
+        const handleResize = () => map.invalidateSize();
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [map]);
+
+    return null;
+}
+
+// ── Neon marker icons by risk level ──
 function createCyberMarkerIcon(riskLevel) {
     const colors = {
         low: { fill: '#00e676', glow: 'rgba(0,230,118,0.4)', ring: 'rgba(0,230,118,0.2)' },
@@ -56,13 +79,16 @@ export default function MapView({ markers = [], onMapClick, onMarkerClick, cente
             center={center || defaultCenter}
             zoom={zoom || defaultZoom}
             className="w-full h-full"
-            style={{ background: '#050805' }}
+            style={{ width: '100%', height: '100%', background: '#050805' }}
             zoomControl={true}
         >
-            {/* Dark tiles — CartoDB Dark Matter */}
+            {/* FixMap — MUST be first child to force invalidateSize */}
+            <FixMap />
+
+            {/* Dark tiles — CartoDB Dark Matter (free, no API key) */}
             <TileLayer
                 url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org">OSM</a>'
+                attribution='&copy; <a href="https://www.openstreetmap.org">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>'
             />
 
             <MapClickHandler onClick={onMapClick} />
