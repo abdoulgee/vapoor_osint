@@ -1,6 +1,6 @@
 /**
- * CommandCenter — SOC Map-first command center with neon markers,
- * terminal log, and integrated IntelPanel.
+ * CommandCenter — SOC Map-first command center.
+ * Full-height map, control bar, terminal log, and intel panel.
  */
 
 import { useState, useEffect } from 'react';
@@ -25,6 +25,7 @@ export default function CommandCenter() {
     const [showMarkerForm, setShowMarkerForm] = useState(false);
     const [clickLatLng, setClickLatLng] = useState(null);
     const [showPanel, setShowPanel] = useState(false);
+    const [showTerminal, setShowTerminal] = useState(true);
 
     useEffect(() => { fetchCases({ limit: 100 }); }, []);
 
@@ -64,18 +65,17 @@ export default function CommandCenter() {
         }
     };
 
-    // Marker risk stats
     const riskCounts = markers.reduce((acc, m) => {
         acc[m.risk_level] = (acc[m.risk_level] || 0) + 1;
         return acc;
     }, {});
 
     return (
-        <div className="flex h-[calc(100vh-2.5rem)]">
-            {/* Left: Map + Controls */}
-            <div className="flex-1 flex flex-col">
+        <div className="flex h-full w-full">
+            {/* Center: Map area + controls + terminal */}
+            <div className="flex-1 flex flex-col min-w-0 min-h-0">
                 {/* Control Bar */}
-                <div className="flex items-center justify-between gap-3 px-3 py-1.5 bg-soc-900 border-b border-soc-700 font-mono">
+                <div className="shrink-0 flex items-center justify-between gap-3 px-3 py-1.5 bg-soc-900 border-b border-soc-700 font-mono">
                     <div className="flex items-center gap-3">
                         <select value={selectedCase?.id || ''} onChange={handleCaseChange}
                             className="cyber-select min-w-[200px]">
@@ -90,21 +90,17 @@ export default function CommandCenter() {
                     </div>
 
                     <div className="flex items-center gap-4 text-[10px]">
-                        {/* Risk counter */}
                         <div className="flex items-center gap-3">
                             <span className="text-soc-500">TGT:</span>
                             <span className="text-cyber-400 font-bold">{markers.length}</span>
-                            {riskCounts.critical > 0 && (
-                                <span className="text-threat-critical threat-pulse">CRIT:{riskCounts.critical}</span>
-                            )}
-                            {riskCounts.high > 0 && (
-                                <span className="text-threat-high">HIGH:{riskCounts.high}</span>
-                            )}
-                            {riskCounts.medium > 0 && (
-                                <span className="text-threat-medium">MED:{riskCounts.medium}</span>
-                            )}
+                            {riskCounts.critical > 0 && <span className="text-threat-critical threat-pulse">CRIT:{riskCounts.critical}</span>}
+                            {riskCounts.high > 0 && <span className="text-threat-high">HIGH:{riskCounts.high}</span>}
+                            {riskCounts.medium > 0 && <span className="text-threat-medium">MED:{riskCounts.medium}</span>}
                         </div>
-
+                        <button onClick={() => setShowTerminal(!showTerminal)}
+                            className="text-[9px] font-mono text-soc-500 hover:text-cyber-400 transition-colors">
+                            [{showTerminal ? 'HIDE' : 'SHOW'} LOG]
+                        </button>
                         {selectedCase && (
                             <button onClick={() => { setClickLatLng(null); setShowMarkerForm(true); }}
                                 className="cyber-btn py-1 px-2.5 text-[9px]">
@@ -114,8 +110,8 @@ export default function CommandCenter() {
                     </div>
                 </div>
 
-                {/* Map */}
-                <div className="flex-1 relative">
+                {/* MAP — takes all remaining height */}
+                <div className="flex-1 min-h-0 relative">
                     <MapView
                         markers={markers}
                         onMapClick={handleMapClick}
@@ -125,10 +121,12 @@ export default function CommandCenter() {
                     />
                 </div>
 
-                {/* Bottom Terminal Log */}
-                <div className="h-48 border-t border-soc-700">
-                    <TerminalLog caseId={selectedCase?.id} />
-                </div>
+                {/* Terminal Log — collapsible */}
+                {showTerminal && (
+                    <div className="h-40 shrink-0 border-t border-soc-700">
+                        <TerminalLog caseId={selectedCase?.id} />
+                    </div>
+                )}
             </div>
 
             {/* Right: Intel Panel */}

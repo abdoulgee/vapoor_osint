@@ -16,6 +16,7 @@ import FOITracker from './pages/FOITracker';
 import AuditLogs from './pages/AuditLogs';
 import UserManagement from './pages/UserManagement';
 import CommandCenter from './pages/CommandCenter';
+import OsintPanel from './pages/OsintPanel';
 
 export default function App() {
     return (
@@ -32,6 +33,7 @@ export default function App() {
                         <Route path="/dashboard" element={<Dashboard />} />
                         <Route path="/cases" element={<Cases />} />
                         <Route path="/cases/:id" element={<CaseDetail />} />
+                        <Route path="/osint" element={<OsintPanel />} />
                         <Route path="/foi" element={<FOITracker />} />
                         <Route path="/audit-logs" element={
                             <ProtectedRoute roles={['admin']}><AuditLogs /></ProtectedRoute>
@@ -41,10 +43,11 @@ export default function App() {
                         } />
                     </Route>
 
-                    {/* Default: map-first command center */}
+                    {/* Default */}
                     <Route path="*" element={<Navigate to="/command-center" replace />} />
                 </Routes>
             </BrowserRouter>
         </ToastProvider>
     );
 }
+

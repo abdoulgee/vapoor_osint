@@ -1,5 +1,5 @@
 /**
- * Topbar — SOC Status Bar showing system status, threat level, user, and time.
+ * Topbar — SOC Status Bar. Now flow-based (not fixed) so flexbox layout works.
  */
 
 import { useState, useEffect } from 'react';
@@ -18,12 +18,10 @@ export default function Topbar() {
     }, []);
 
     const handleLogout = () => { logout(); navigate('/login'); };
-
     const utcTime = time.toISOString().slice(11, 19);
-    const localTime = time.toLocaleTimeString('en-US', { hour12: false });
 
     return (
-        <header className="fixed top-0 left-14 right-0 h-10 bg-soc-900 border-b border-soc-700/60 z-30 flex items-center justify-between px-3 font-mono">
+        <header className="h-10 shrink-0 bg-soc-900 border-b border-soc-700/60 flex items-center justify-between px-3 font-mono z-30">
             {/* Left: System Status */}
             <div className="flex items-center gap-4 text-[10px] tracking-wider uppercase">
                 <div className="flex items-center gap-1.5">
@@ -42,14 +40,14 @@ export default function Topbar() {
                 </div>
             </div>
 
-            {/* Center: Platform Name */}
+            {/* Center */}
             <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2">
                 <span className="text-[10px] text-soc-500 tracking-[0.3em] uppercase">VAPOR SCAN</span>
                 <span className="text-[10px] text-soc-700">//</span>
                 <span className="text-[10px] text-cyber-400/50 tracking-wider">OSINT PLATFORM</span>
             </div>
 
-            {/* Right: User + Time + Actions */}
+            {/* Right */}
             <div className="flex items-center gap-3 text-[10px]">
                 <NotificationBell />
                 <span className="text-soc-700">│</span>
@@ -61,10 +59,7 @@ export default function Topbar() {
                     <span className="text-cyber-400/60 uppercase text-[9px] border border-cyber-400/20 px-1 rounded-sm">{user?.role}</span>
                 </div>
                 <span className="text-soc-700">│</span>
-                <div className="flex items-center gap-1.5">
-                    <span className="text-soc-500">UTC</span>
-                    <span className="text-cyber-400 tabular-nums">{utcTime}</span>
-                </div>
+                <span className="text-cyber-400 tabular-nums">{utcTime}</span>
                 <span className="text-soc-700">│</span>
                 <button onClick={handleLogout} className="text-soc-400 hover:text-threat-critical transition-colors uppercase tracking-wider" title="Logout">
                     [EXIT]

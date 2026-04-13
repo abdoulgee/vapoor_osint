@@ -26,7 +26,7 @@ from app.models.notification import Notification
 from app.models.timeline import InvestigationEvent
 
 # Import routers
-from app.routers import auth, users, cases, markers, evidence, foi, audit_logs, notifications, analytics, reports, timeline
+from app.routers import auth, users, cases, markers, evidence, foi, audit_logs, notifications, analytics, reports, timeline, osint
 
 
 @asynccontextmanager
@@ -70,6 +70,7 @@ app.include_router(notifications.router)
 app.include_router(analytics.router)
 app.include_router(reports.router)
 app.include_router(timeline.router)
+app.include_router(osint.router)
 
 
 @app.get("/", tags=["Health"])
